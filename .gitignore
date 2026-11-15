@@ -1,0 +1,18 @@
+# Runtime configuration and secrets; only sanitized templates belong in Git.
+.env*
+!.env.example
+!.env.*.example
+*.log
+backups/
+__pycache__/
+*.sqlite*
+*.db
+*.local.json
+*.key
+*.pem
+*.pfx
+*.p12
+id_rsa
+id_ed25519
+.serena/
+VLM_DATA/

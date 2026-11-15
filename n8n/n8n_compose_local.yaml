@@ -1,0 +1,46 @@
+services:
+  n8n_dcsvc:
+    image: docker.n8n.io/n8nio/n8n:${N8N_VERSION:?Set local version}
+    restart: unless-stopped
+    ports:
+      - "${N8N_HOST:?Set loopback host}:${N8N_PORT:?Set local port}:5678"
+    environment:
+      N8N_HOST: localhost
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+      N8N_EDITOR_BASE_URL: http://localhost:${N8N_PORT}/
+      N8N_WEBHOOK_URL: http://localhost:${N8N_PORT}/
+      N8N_SECURE_COOKIE: "false"
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY:?Local encryption key missing}
+      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "true"
+      N8N_RUNNERS_MODE: external
+      N8N_RUNNERS_AUTH_TOKEN: ${N8N_RUNNERS_AUTH_TOKEN:?Local runner token missing}
+      N8N_RUNNERS_BROKER_LISTEN_ADDRESS: 0.0.0.0
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      GENERIC_TIMEZONE: ${N8N_TIMEZONE}
+      TZ: ${N8N_TIMEZONE}
+      EXECUTIONS_DATA_PRUNE: "true"
+      EXECUTIONS_DATA_MAX_AGE: 168
+    volumes:
+      - type: bind
+        source: ${N8N_DATA_PATH:?Set a data path inside this directory}
+        target: /home/node/.n8n
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:5678/healthz/readiness').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 12
+    stop_grace_period: 60s
+  runners_dcsvc:
+    image: n8nio/runners:${N8N_VERSION:?Set local version}
+    restart: unless-stopped
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    environment:
+      N8N_RUNNERS_TASK_BROKER_URI: http://n8n_dcsvc:5679
+      N8N_RUNNERS_AUTH_TOKEN: ${N8N_RUNNERS_AUTH_TOKEN}
+    depends_on:
+      n8n_dcsvc:
+        condition: service_healthy
+
