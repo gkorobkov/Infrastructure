@@ -20,6 +20,8 @@ PowerShell uses strict mode and terminating errors. Preserve the existing handli
 
 ## Documentation Structure
 
+For `tunnels`, follow the Russian-language specification: user-facing documentation and messages are in Russian and address the user without the word "student". Keep exactly three provider launch scripts under `tunnels`, named `tunnels_start_cloudflare.ps1`, `tunnels_start_ngrok.ps1` and `tunnels_start_localtunnel.ps1`, with shared helpers as needed. Use UTF-8 with BOM for Russian PowerShell files so Windows PowerShell 5.1 decodes them correctly; retain CRLF. Only publish loopback HTTP services, require consent for dependency installation/downloads, do not send webhook POST automatically, do not change application/provider configurations, and terminate only processes owned by the current launch. Keep authtokens out of arguments, logs and repository files. Use `tunnels/tunnels_readme.md` for the central runbook.
+
 Keep the root `README.md` as a stable directory index. For each project directory, use a heading matching its directory name, a short general description and a relative link to its own documentation. Update the root index only when directories, their purpose or documentation links change.
 
 Keep installation, configuration, commands, troubleshooting, verification and planned work in the corresponding project directory. Name each directory's main documentation file `<service>_readme.md`, using the short service or entity name first; for example, `n8n/n8n_readme.md`. Use lowercase filenames and update all links when renaming documentation. Maintain detailed documentation alongside changes to that project instead of duplicating it in the root README.
