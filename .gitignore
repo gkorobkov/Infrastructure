@@ -16,3 +16,5 @@ id_rsa
 id_ed25519
 .serena/
 VLM_DATA/
+.n8n_macos_lock/
+.n8n_env.*

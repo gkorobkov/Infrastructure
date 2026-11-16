@@ -1,7 +1,7 @@
 <#
 Install/check Docker Desktop and deploy local n8n on Windows 11.
-Run n8n_deploy_local.cmd, or: powershell -NoProfile -ExecutionPolicy Bypass -File .\n8n_deploy_local.ps1
-Example: double-click n8n_deploy_local.cmd; the UI opens after readiness succeeds.
+Run n8n_docker_compose_deploy_win.cmd, or: powershell -NoProfile -ExecutionPolicy Bypass -File .\n8n_docker_compose_deploy_win.ps1
+Example: double-click n8n_docker_compose_deploy_win.cmd; the UI opens after readiness succeeds.
 Settings/secrets are stored in .env.local. No server settings are loaded.
 #>
 [CmdletBinding()]
@@ -119,19 +119,19 @@ function Write-LocalSetupConflict {
     $owners = @($Processes | Where-Object {
         $_.ProcessId -ne $PID -and (
             ($LegacyProcessId -gt 0 -and $_.ProcessId -eq $LegacyProcessId) -or
-            ($_.Name -in @('powershell.exe', 'pwsh.exe') -and $_.CommandLine -match '(?i)n8n_deploy_local\.ps1' -and $_.CommandLine -match '(?i)-PrepareMachine')
+            ($_.Name -in @('powershell.exe', 'pwsh.exe') -and $_.CommandLine -match '(?i)n8n_docker_compose_deploy_win\.ps1' -and $_.CommandLine -match '(?i)-PrepareMachine')
         )
     })
     if (-not $owners.Count) {
         if ($StatusOnly) {
             Write-LocalProgress 'No active n8n prerequisite setup was found NOW. A PID from an earlier message may already have exited.'
             Write-LocalProgress 'No processes were stopped. Start setup normally:'
-            Write-LocalProgress ("   & '" + (Join-Path $script:LocalRoot 'n8n_deploy_local.cmd').Replace("'", "''") + "'")
+            Write-LocalProgress ("   & '" + (Join-Path $script:LocalRoot 'n8n_docker_compose_deploy_win.cmd').Replace("'", "''") + "'")
             return
         }
         else { Write-LocalProgress 'The previous setup may have exited, or this account cannot read its details. Do not search for an old PID or terminate unrelated processes.' }
         Write-LocalProgress 'Refresh with administrator access (approve UAC); paste this command in your terminal:'
-        Write-LocalProgress ("   & '" + (Join-Path $script:LocalRoot 'n8n_deploy_local.cmd').Replace("'", "''") + "' status")
+        Write-LocalProgress ("   & '" + (Join-Path $script:LocalRoot 'n8n_docker_compose_deploy_win.cmd').Replace("'", "''") + "' status")
         Write-LocalProgress 'If the administrator status check also finds no setup, run the launcher normally again.'
         return
     }
@@ -144,7 +144,7 @@ function Write-LocalSetupConflict {
         Write-LocalProgress ('Running command: ' + $owner.CommandLine)
         if ($title) { Write-LocalProgress ('Window title: ' + $title) }
         else { Write-LocalProgress 'Window title: not visible (this may be an older hidden setup). Use the log or Task Manager steps below.' }
-        $scriptPath = Join-Path $script:LocalRoot 'n8n_deploy_local.ps1'
+        $scriptPath = Join-Path $script:LocalRoot 'n8n_docker_compose_deploy_win.ps1'
         $pathMatch = [regex]::Match([string]$owner.CommandLine, '(?i)-File\s+(?:"([^"]+)"|(\S+))')
         if ($pathMatch.Success) {
             $scriptPath = if ($pathMatch.Groups[1].Success) { $pathMatch.Groups[1].Value } else { $pathMatch.Groups[2].Value }
@@ -169,15 +169,15 @@ function Write-LocalSetupConflict {
         Write-LocalProgress ''
         Write-LocalProgress 'WHAT TO DO:'
         Write-LocalProgress '1. Obtain CURRENT process details with this command (it requests administrator access and does not install or stop anything):'
-        Write-LocalProgress ("   & '" + (Join-Path $directory 'n8n_deploy_local.cmd').Replace("'", "''") + "' status")
+        Write-LocalProgress ("   & '" + (Join-Path $directory 'n8n_docker_compose_deploy_win.cmd').Replace("'", "''") + "' status")
         Write-LocalProgress '2. For a visible setup window press Alt+Tab and use the window title printed above. For Task Manager press Ctrl+Shift+Esc and select Details, not the grouped Processes tab shown by default. If the PID is absent, it has exited: refresh status instead of searching for that old number.'
         Write-LocalProgress '3. To watch the recorded setup commands: open Windows PowerShell and paste this line. Ctrl+C stops watching the log; it does not cancel setup:'
         Write-LocalProgress ("   Get-Content -LiteralPath '" + $ownerLog.Replace("'", "''") + "' -Tail 20 -Wait")
         Write-LocalProgress '4. To CANCEL setup from this directory, run the following command and approve UAC. It discovers and rechecks live processes; no PID needs to be copied:'
-        Write-LocalProgress ("   & '" + (Join-Path $directory 'n8n_deploy_local.cmd').Replace("'", "''") + "' cancel")
+        Write-LocalProgress ("   & '" + (Join-Path $directory 'n8n_docker_compose_deploy_win.cmd').Replace("'", "''") + "' cancel")
         Write-LocalProgress '   Cancellation interrupts Windows/WSL setup and its children. It does not delete n8n workflows or Docker volumes. If setup has already exited, cancellation does nothing.'
         Write-LocalProgress '5. After that process has exited, start this launcher again:'
-        Write-LocalProgress ("   & '" + (Join-Path $directory 'n8n_deploy_local.cmd').Replace("'", "''") + "'")
+        Write-LocalProgress ("   & '" + (Join-Path $directory 'n8n_docker_compose_deploy_win.cmd').Replace("'", "''") + "'")
     }
 }
 
@@ -201,10 +201,10 @@ function Invoke-LocalSetupDiagnostics {
     $processes = @(Get-CimInstance Win32_Process)
     Write-LocalSetupConflict -Processes $processes -StatusOnly
     if (-not $Cancel) { return }
-    $expectedScript = Join-Path $script:LocalRoot 'n8n_deploy_local.ps1'
+    $expectedScript = Join-Path $script:LocalRoot 'n8n_docker_compose_deploy_win.ps1'
     $owners = @($processes | Where-Object { $_.ProcessId -ne $PID -and (Test-LocalSetupIdentity $_ $expectedScript) })
     if (-not $owners.Count) {
-        Write-LocalProgress 'Nothing to cancel: no active prerequisite setup from THIS directory exists. No processes were stopped. Run n8n_deploy_local.cmd normally.'
+        Write-LocalProgress 'Nothing to cancel: no active prerequisite setup from THIS directory exists. No processes were stopped. Run n8n_docker_compose_deploy_win.cmd normally.'
         return
     }
     foreach ($owner in $owners) {
@@ -221,7 +221,7 @@ function Invoke-LocalSetupDiagnostics {
             if ($remaining -and (Test-LocalSetupIdentity $remaining $expectedScript)) { throw 'Cancellation failed. The process is still running; the command output above explains the failure.' }
         }
     }
-    Write-LocalProgress 'Cancellation check complete. Run n8n_deploy_local.cmd normally to start again.'
+    Write-LocalProgress 'Cancellation check complete. Run n8n_docker_compose_deploy_win.cmd normally to start again.'
 }
 
 function Start-LocalSetupDiagnostics {
@@ -230,7 +230,7 @@ function Start-LocalSetupDiagnostics {
     $logPath = Join-Path $script:LocalRoot $logName
     $mode = if ($Cancel) { '-CancelSetup' } else { '-SetupStatus' }
     $powershell = Join-Path $PSHOME 'powershell.exe'
-    $arguments = Format-ProcessArguments @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $script:LocalRoot 'n8n_deploy_local.ps1'), $mode, '-DiagnosticsAdmin', '-DiagnosticsLogName', $logName)
+    $arguments = Format-ProcessArguments @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $script:LocalRoot 'n8n_docker_compose_deploy_win.ps1'), $mode, '-DiagnosticsAdmin', '-DiagnosticsLogName', $logName)
     Write-LocalCommand -Command ('Start-Process powershell.exe -Verb RunAs ' + $mode) -Purpose 'Request administrator access to inspect live setup processes. Results appear in this original console; no Windows components are installed.'
     $process = Start-Process -FilePath $powershell -ArgumentList $arguments -Verb RunAs -WindowStyle Normal -PassThru
     $code = Wait-LocalProcess -Process $process -Activity 'Current setup diagnostics' -LogPath $logPath -HeartbeatSeconds 0
@@ -378,7 +378,7 @@ function Enable-LocalPrerequisites {
 }
 
 function Register-LocalResume {
-    $launcher = Join-Path $script:LocalRoot 'n8n_deploy_local.cmd'
+    $launcher = Join-Path $script:LocalRoot 'n8n_docker_compose_deploy_win.cmd'
     $key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\RunOnce'
     $resumeCommand = '"' + $env:ComSpec + '" /c ""' + $launcher + '""'
     if (-not (Test-Path $key)) {
@@ -480,7 +480,7 @@ if ($MyInvocation.InvocationName -ne '.') {
             if ($DiagnosticsAdmin) {
                 $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
                 $principal = New-Object Security.Principal.WindowsPrincipal($identity)
-                if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { throw 'Administrator diagnostics require UAC approval. Run n8n_deploy_local.cmd status or n8n_deploy_local.cmd cancel normally.' }
+                if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { throw 'Administrator diagnostics require UAC approval. Run n8n_docker_compose_deploy_win.cmd status or n8n_docker_compose_deploy_win.cmd cancel normally.' }
                 if ($DiagnosticsLogName -notmatch '^\.local-setup-diagnostics-[a-f0-9]{32}\.log$') { throw 'Invalid diagnostics log name.' }
                 $script:PrerequisiteLogFile = Join-Path $script:LocalRoot $DiagnosticsLogName
                 Invoke-LocalSetupDiagnostics -Cancel:$CancelSetup

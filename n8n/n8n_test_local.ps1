@@ -5,7 +5,7 @@ Example: run this command from the n8n directory on Windows 11.
 #>
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-. (Join-Path $PSScriptRoot 'n8n_deploy_local.ps1')
+. (Join-Path $PSScriptRoot 'n8n_docker_compose_deploy_win.ps1')
 $testDirectory = Join-Path ([IO.Path]::GetTempPath()) ('n8n-local-test-' + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $testDirectory | Out-Null
 try {
@@ -39,8 +39,8 @@ try {
         try { Assert-LocalConfig $bad } catch { $rejected = $true }
         if (-not $rejected) { throw ('Unsafe setting was accepted: ' + $case[0]) }
     }
-    $quoted = Format-ProcessArguments @('-File', 'C:\User Files\n8n\n8n_deploy_local.ps1')
-    if ($quoted -ne '"-File" "C:\User Files\n8n\n8n_deploy_local.ps1"') { throw 'Path quoting failed.' }
+    $quoted = Format-ProcessArguments @('-File', 'C:\User Files\n8n\n8n_docker_compose_deploy_win.ps1')
+    if ($quoted -ne '"-File" "C:\User Files\n8n\n8n_docker_compose_deploy_win.ps1"') { throw 'Path quoting failed.' }
     $explanation = @(& { Write-LocalCommand -Command 'wsl.exe --version' -Purpose 'Check WSL compatibility before downloading anything.' } 6>&1)
     $explanationText = $explanation -join "`n"
     if (-not $explanationText.Contains('Goal: Check WSL compatibility before downloading anything.') -or -not $explanationText.Contains('RUN: wsl.exe --version') -or $explanationText.IndexOf('Goal:') -gt $explanationText.IndexOf('RUN:')) { throw 'Command explanation is missing or printed after the command.' }
@@ -61,7 +61,7 @@ Write-LocalProgress 'prerequisite stage finished'
 exit 7
 '@
     $childScript = $childScript.Replace('__LOG__', $progressLog.Replace("'", "''"))
-    $childScript = $childScript.Replace('__SCRIPT__', (Join-Path $PSScriptRoot 'n8n_deploy_local.ps1').Replace("'", "''"))
+    $childScript = $childScript.Replace('__SCRIPT__', (Join-Path $PSScriptRoot 'n8n_docker_compose_deploy_win.ps1').Replace("'", "''"))
     $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($childScript))
     $powershell = Join-Path $PSHOME 'powershell.exe'
     Write-Host '+ Start-Process powershell.exe (harmless progress-display test)'
@@ -91,17 +91,17 @@ exit 7
     try { Assert-NoLegacyPrerequisiteProcess $legacyLog } catch { $rejectedLegacy = $_.Exception.Message.Contains('No second setup was started') }
     if (-not $rejectedLegacy) { throw 'Active legacy setup was not detected.' }
     $processFixture = @(
-        [pscustomobject]@{ ProcessId=900001; ParentProcessId=900000; Name='powershell.exe'; CreationDate='2026-11-15 11:00:00'; CommandLine='powershell.exe -File "C:\User Files\n8n\n8n_deploy_local.ps1" -PrepareMachine' },
+        [pscustomobject]@{ ProcessId=900001; ParentProcessId=900000; Name='powershell.exe'; CreationDate='2026-11-15 11:00:00'; CommandLine='powershell.exe -File "C:\User Files\n8n\n8n_docker_compose_deploy_win.ps1" -PrepareMachine' },
         [pscustomobject]@{ ProcessId=900002; ParentProcessId=900001; Name='wsl.exe'; CreationDate='2026-11-15 11:00:01'; CommandLine='wsl.exe --update --web-download' },
         [pscustomobject]@{ ProcessId=900003; ParentProcessId=900000; Name='wsl.exe'; CreationDate='2026-11-15 11:00:02'; CommandLine='unrelated distribution shell' }
     )
     $report = (@(& { Write-LocalSetupConflict -Processes $processFixture } 6>&1)) -join "`n"
-    foreach ($detail in @('PID 900001', 'PID 900002', 'wsl.exe --update --web-download', 'C:\User Files\n8n\.local-prerequisites.log', 'Alt+Tab', 'Ctrl+Shift+Esc', 'Get-Content -LiteralPath', "& 'C:\User Files\n8n\n8n_deploy_local.cmd' status", "& 'C:\User Files\n8n\n8n_deploy_local.cmd' cancel")) {
+    foreach ($detail in @('PID 900001', 'PID 900002', 'wsl.exe --update --web-download', 'C:\User Files\n8n\.local-prerequisites.log', 'Alt+Tab', 'Ctrl+Shift+Esc', 'Get-Content -LiteralPath', "& 'C:\User Files\n8n\n8n_docker_compose_deploy_win.cmd' status", "& 'C:\User Files\n8n\n8n_docker_compose_deploy_win.cmd' cancel")) {
         if (-not $report.Contains($detail)) { throw ('User conflict guidance is missing: ' + $detail) }
     }
     if ($report.Contains('unrelated distribution shell') -or $report.Contains('taskkill /PID 900003')) { throw 'Conflict report included an unrelated WSL process.' }
     if ($report.Contains('taskkill /PID')) { throw 'Conflict instructions still require copying a stale PID.' }
-    $expectedScript = 'C:\User Files\n8n\n8n_deploy_local.ps1'
+    $expectedScript = 'C:\User Files\n8n\n8n_docker_compose_deploy_win.ps1'
     $original = $processFixture[0]
     if (-not (Test-LocalSetupSnapshot $original $original $expectedScript)) { throw 'Valid live setup identity was rejected.' }
     if ((Test-LocalSetupSnapshot $original $null $expectedScript)) { throw 'Exited process was accepted for cancellation.' }
@@ -109,7 +109,7 @@ exit 7
     $reused.CreationDate = '2026-11-15 12:00:00'
     if ((Test-LocalSetupSnapshot $original $reused $expectedScript)) { throw 'Reused PID was accepted for cancellation.' }
     $foreign = $original | Select-Object *
-    $foreign.CommandLine = 'powershell.exe -File "C:\Other User\n8n\n8n_deploy_local.ps1" -PrepareMachine'
+    $foreign.CommandLine = 'powershell.exe -File "C:\Other User\n8n\n8n_docker_compose_deploy_win.ps1" -PrepareMachine'
     if ((Test-LocalSetupSnapshot $original $foreign $expectedScript)) { throw 'Setup from another directory was accepted for cancellation.' }
     $emptyReport = (@(& { Write-LocalSetupConflict -Processes @($processFixture[2]) -StatusOnly } 6>&1)) -join "`n"
     if (-not $emptyReport.Contains('No active n8n prerequisite setup was found NOW') -or $emptyReport.Contains('taskkill')) { throw 'No-process status instructions were misleading.' }

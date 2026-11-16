@@ -1,5 +1,9 @@
 # Repository Guidelines
 
+Name local n8n Docker Compose deployment launchers `n8n_docker_compose_deploy_win.cmd` / `.ps1` for Windows and `n8n_docker_compose_deploy_mac.command` / `.sh` for macOS. The OS suffix replaces the previous `local` suffix for these launchers. Keep the shared Compose file and environment filenames unchanged; update launcher references, resume commands, process identity checks, tests and documentation together when renaming.
+
+macOS local n8n uses `n8n/n8n_docker_compose_deploy_mac.command` (Finder) and `n8n/n8n_docker_compose_deploy_mac.sh` (Bash 3.2 compatible, LF). Reuse the shared Compose file, `.env.local`, and `./VLM_DATA`; never evaluate env files as shell code or regenerate an existing data directory's encryption key. macOS `status` queries the Docker engine, `check` initializes/validates configuration, and Ctrl+C interrupts the current launch without killing Docker or deleting data. Docker Desktop installation and license acceptance remain interactive. Verify on a real Mac before claiming native installation coverage.
+
 ## Project Structure & Module Organization
 
 This repository currently contains a Windows 11 local n8n deployment. The CMD entry point invokes PowerShell. PowerShell loads `.env.local`, handles Windows/WSL and Docker Desktop prerequisites, and deploys `n8n_compose_local.yaml`. Compose runs n8n with persistent SQLite storage in the local ./VLM_DATA bind mount and a separate task runner. Both containers share the configured exact n8n version. The local UI binds only to loopback.
@@ -8,7 +12,7 @@ The `.env.local.example` file is a public template. The launcher creates `.env.l
 
 ## Build, Test, and Development Commands
 
-Use `n8n/n8n_deploy_local.cmd` to deploy. Its `status` argument inspects current prerequisite processes; its `cancel` argument explicitly cancels a verified setup from the same directory. These operations are distinct from configuration tests.
+Use `n8n/n8n_docker_compose_deploy_win.cmd` to deploy. Its `status` argument inspects current prerequisite processes; its `cancel` argument explicitly cancels a verified setup from the same directory. These operations are distinct from configuration tests.
 
 Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\n8n\n8n_test_local.ps1` from the repository root for verification. This script checks generated-key stability, unsafe configuration rejection, live output, shared logs and process identity without installing software or starting containers. It renders Compose configuration when a local Docker CLI is available. Clean Windows installation, UAC and restart behavior require separate VM testing.
 
@@ -38,7 +42,7 @@ Declare all persistent mounts explicitly as bind mounts with `type`, `source` an
 
 ## File Naming and Agent Communication
 
-Start project-specific filenames with the entity or short service name, followed by the action or role, then the environment when applicable. Use lowercase words separated by underscores: `n8n_deploy_local.ps1`, `n8n_deploy_local.cmd`, `n8n_test_local.ps1`, `n8n_compose_local.yaml` and `n8n_readme.md`. Keep conventional discovery filenames such as root `README.md`, `AGENTS.md`, `.env.local`, `.env.local.example`, `.gitignore` and `.editorconfig` unchanged. When renaming files, update all references, process identity checks, diagnostic commands, tests and documentation together.
+Start project-specific filenames with the entity or short service name, followed by the action or role, then the environment when applicable. Use lowercase words separated by underscores: `n8n_docker_compose_deploy_win.ps1`, `n8n_docker_compose_deploy_win.cmd`, `n8n_test_local.ps1`, `n8n_compose_local.yaml` and `n8n_readme.md`. Keep conventional discovery filenames such as root `README.md`, `AGENTS.md`, `.env.local`, `.env.local.example`, `.gitignore` and `.editorconfig` unchanged. When renaming files, update all references, process identity checks, diagnostic commands, tests and documentation together.
 
 Record new or changed repository rules and persistent user preferences in `AGENTS.md` as part of the task. Explicitly tell the user in your response that you updated `AGENTS.md` and which rules you recorded. Also state which MCP server you use for the task, including Serena, and distinguish actual MCP operations from local shell commands and browser tools. Use Serena first for code search, navigation, semantic analysis and supported edits; read its initial instructions and `global/user_preferences/serena` memory before first use. If Serena is unavailable, check the connection, attempt to restore it and report any remaining limitation.
 
