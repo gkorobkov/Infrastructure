@@ -12,11 +12,11 @@
 
 Скрипты предназначены для учебных и демонстрационных проектов с n8n, Python/FastAPI, Node.js и другими локальными HTTP-серверами.
 
-Основной сценарий:
+Основной сценарий (Web UI может находиться на любом внешнем HTTPS-адресе; запросы также могут отправлять другие внешние клиенты):
 
 ```text
 Web UI:
-https://ai-agent-demo.gkorobkov.ru
+https://service-name.ru
 
          |
          | HTTPS POST
@@ -313,7 +313,8 @@ WEBHOOK URL:
 https://example.trycloudflare.com/webhook/my-agent
 
 Скопируйте WEBHOOK URL в Web UI:
-https://ai-agent-demo.gkorobkov.ru
+например, AI Agents Lab: https://ai-agents-lab.gkorobkov.ru/index.html
+или в другой внешний клиент.
 
 Статус:
 - Локальный сервер: доступен
@@ -596,11 +597,13 @@ npx --yes localtunnel --port 5678
 
 ## 11. Интеграция с Web UI
 
-Использовать:
+Web UI не привязан к конкретному сайту. Обозначать адрес условно:
 
 ```text
-https://ai-agent-demo.gkorobkov.ru
+Web UI https://service-name.ru
 ```
+
+При объяснении, куда скопировать WEBHOOK URL, можно привести пример [AI Agents Lab](https://ai-agents-lab.gkorobkov.ru/index.html). Этот сайт не является обязательной частью архитектуры; допускается любой другой внешний клиент.
 
 Пользователь должен:
 
