@@ -6,7 +6,7 @@
   - [Settings](#settings)
   - [Terminal alternative](#terminal-alternative)
   - [Files and verification](#files-and-verification)
-  - [Public configuration examples](#public-configuration-examples)
+  - [Local storage and backups](#local-storage-and-backups)
   - [Planned work](#planned-work)
 
 # Local n8n for Windows 11 Users
@@ -72,31 +72,26 @@ If another setup is running, the console prints a timestamped process snapshot a
 
 ## Files and verification
 
-`n8n_deploy_local.cmd` is the User entry point. It calls `n8n_deploy_local.ps1`, which uses `n8n_compose_local.yaml` and `.env.local`. SQLite data lives in the local `./VLM_DATA` directory through an explicit bind mount at `/home/node/.n8n`. The local configuration stays in `.env.local`; no runtime server configuration is included in this repository.
+`n8n_deploy_local.cmd` is the entry point. It calls `n8n_deploy_local.ps1`, which uses `n8n_compose_local.yaml` and `.env.local`. SQLite data lives in the local `./VLM_DATA` directory through an explicit bind mount at `/home/node/.n8n`. The local configuration stays in `.env.local`; no runtime server configuration is included in this repository.
 
-Developer checks validate configuration, generated-key stability, loopback restrictions, context restrictions and Compose rendering without installing software or starting containers:
+The verification script checks configuration, generated-key stability, loopback restrictions, context restrictions and Compose rendering without installing software or starting containers:
 
 ```powershell
 # Windows 11 PowerShell, from the n8n directory.
 powershell -NoProfile -ExecutionPolicy Bypass -File .\n8n_test_local.ps1
 # Expected: Local launcher checks passed; no software installed and no containers started.
-# If a check fails, fix it before distributing the launcher to Users.
+# If a check fails, read the reported error to identify the configuration problem.
 ```
 
-The first-run installation/elevation/restart flow must also be tested on a clean Windows 11 machine or VM with nested virtualization. Static/configuration checks do not reproduce Windows installation or firmware behavior.
+These checks do not exercise software installation, UAC prompts or Windows restarts. Those steps occur during first-run setup on Windows 11.
 
 References: [Docker Desktop Windows installation and requirements](https://docs.docker.com/desktop/setup/install/windows-install/), [Microsoft WSL installation](https://learn.microsoft.com/windows/wsl/install).
 
-## Public configuration examples
-
-Use `User` in descriptions, `user-name` in example identifiers and `dns-server-name.ru` for domain examples. This local setup uses `localhost` and requires no domain. Keep real settings only in the ignored runtime file. Do not publish `.env.local`, setup logs, database files, private keys or backups.
 
 ## Planned work
 
 Local webhook configuration will be added separately. This directory does not yet contain a webhook tunnel or DNS configuration script.
 
-## Environment naming and local storage
-
-Service-specific env variables start with `N8N_`, for example `N8N_PROJECT_NAME` and `N8N_VERSION`. Variable names are identical across environments; the selected env file supplies their values. Do not add an environment name to the variable prefix. The launcher reads these names from `.env.local`; use the same names in custom settings. Container environment names follow the n8n application requirements.
+## Local storage and backups
 
 Persistent storage uses an explicit bind mount from `N8N_DATA_PATH=./VLM_DATA` to `/home/node/.n8n`. Relative paths resolve from the directory containing `n8n_compose_local.yaml`, even when launching from another directory. Keep the data directory and the original encryption key together when backing up or moving the installation. If an earlier deployment used a Docker-managed volume, copy its data into this directory with n8n stopped before starting with the bind mount; changing the mount alone does not transfer existing data.

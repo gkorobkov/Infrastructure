@@ -128,7 +128,7 @@ exit 7
     if ((($silentWait | Select-Object -SkipLast 1) -join "`n").Contains('Still working')) { throw 'Timer messages remain enabled for native progress windows.' }
     $cli = Join-Path $env:ProgramFiles 'Docker\Docker\resources\bin\docker.exe'
     if (Test-Path -LiteralPath $cli) {
-        $result = Invoke-Native $cli @('compose', '--env-file', (Join-Path $testDirectory '.env.local'), '--file', (Join-Path $PSScriptRoot 'n8n_compose_local.yaml'), 'config', '--quiet')
+        $null = Invoke-Native $cli @('compose', '--env-file', (Join-Path $testDirectory '.env.local'), '--file', (Join-Path $PSScriptRoot 'n8n_compose_local.yaml'), 'config', '--quiet')
     }
     Write-Host 'Local launcher checks passed; no software installed and no containers started.'
 } finally {
