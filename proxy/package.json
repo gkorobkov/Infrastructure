@@ -1,0 +1,24 @@
+{
+  "name": "ai-agents-local-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Minimal secure loopback HTTP proxy for browser API labs",
+  "type": "module",
+  "bin": {
+    "ai-agents-local-proxy": "./src/proxy_cli.js"
+  },
+  "scripts": {
+    "start": "node src/proxy_cli.js",
+    "test": "node --test test/*_test.js",
+    "check": "node --check src/proxy_cli.js && node --check src/proxy_server.js && node --check src/proxy_security.js && node --check src/proxy_forward.js && npm test",
+    "build:sea": "node scripts/proxy_build_sea.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.25.5",
+    "postject": "^1.0.0-alpha.6"
+  }
+}

@@ -1,0 +1,44 @@
+name: Local proxy CI
+on:
+  push:
+    paths:
+      - 'proxy/**'
+      - '.github/workflows/proxy_ci.yml'
+  pull_request:
+    paths:
+      - 'proxy/**'
+      - '.github/workflows/proxy_ci.yml'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    defaults:
+      run:
+        working-directory: proxy
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test proxy
+        run: npm test
+      - name: Install development dependencies
+        run: npm install --no-audit --no-fund
+      - name: Build self-contained executable
+        run: npm run build:sea
+      - name: Smoke test executable
+        shell: bash
+        run: |
+          binary=$(find dist -maxdepth 1 -type f \( -name 'ai-agents-local-proxy-*' \) | head -n 1)
+          "$binary" --version
+      - name: Upload executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: proxy-${{ matrix.os }}
+          path: proxy/dist/ai-agents-local-proxy-*
+          if-no-files-found: error
