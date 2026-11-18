@@ -3,6 +3,7 @@
 - [Infrastructure](#infrastructure)
   - [n8n](#n8n)
   - [tunnels](#tunnels)
+  - [proxy](#proxy)
 
 # Infrastructure
 
@@ -19,3 +20,9 @@ See [n8n setup and usage](n8n/n8n_readme.md).
 Public HTTPS tunnels to local HTTP applications through Cloudflare Quick Tunnel, ngrok and localtunnel.
 
 See [tunnel setup and runbooks](tunnels/tunnels_readme.md).
+
+## proxy
+
+Secure universal loopback HTTP proxy for optional browser API forwarding without Docker or per-provider configuration.
+
+See [proxy setup and usage](proxy/proxy_readme.md).
