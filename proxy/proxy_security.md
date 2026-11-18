@@ -1,6 +1,6 @@
 # Local Proxy Security Model
 
-The proxy deliberately enables a trusted browser origin to call external APIs without depending on the external server's CORS response. This increases the origin's privileges: never add untrusted origins to the allowlist. The default implementation accepts `/proxy` only when the request's Origin matches the allowlist. Nonbrowser clients can forge Origin; this is a defense-in-depth policy, not user authentication. Do not make the listener publicly accessible.
+The proxy enables a trusted browser origin to call external APIs without depending on the external server's CORS response. This increases the origin's privileges: never add untrusted origins to the allowlist. The implementation accepts `/proxy` only when the request's Origin matches the allowlist. Nonbrowser clients can forge Origin; this is a defense-in-depth policy, not user authentication. Do not make the listener publicly accessible.
 
 Threats addressed:
 

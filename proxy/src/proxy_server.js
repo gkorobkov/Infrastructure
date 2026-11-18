@@ -5,7 +5,6 @@ import { forward } from './proxy_forward.js';
 import { originAllowed, requireBrowserOrigin, safeHost } from './proxy_security.js';
 
 export const DEFAULT_ORIGINS = [
-  'https://ai-agents-lab.gkorobkov.ru',
   'http://localhost:3000','http://localhost:5173',
   'http://127.0.0.1:3000','http://127.0.0.1:5173',
 ];
@@ -36,7 +35,7 @@ export function createProxyServer(options={}) {
       const localPort=server.address()?.port || config.port;
       if(!safeHost(request.headers.host,localPort)) throw new ProxyError(403,'PROXY_HOST_FORBIDDEN','Invalid Host header.');
       if(request.url==='/health' && request.method==='GET') {
-        const result=Buffer.from(JSON.stringify({status:'ok',service:'ai-agents-local-proxy',version:'1.0.0'}));
+        const result=Buffer.from(JSON.stringify({status:'ok',service:'universal-local-http-proxy',version:'1.0.0'}));
         response.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Content-Length':result.length,'Cache-Control':'no-store'});response.end(result);return;
       }
       if(request.url!=='/proxy') throw new ProxyError(404,'PROXY_NOT_FOUND','Unknown proxy endpoint.');

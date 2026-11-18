@@ -5,7 +5,7 @@ import { createProxyServer, listen } from '../src/proxy_server.js';
 import { isPublicIP, parseTarget, resolvePublicTarget, filterHeaders } from '../src/proxy_security.js';
 
 let upstream, server, origin, upstreamPort, proxyUrl;
-const permitted='https://ai-agents-lab.gkorobkov.ru';
+const permitted='http://localhost:5173';
 function bind(server){return new Promise(resolve=>server.listen(0,'127.0.0.1',()=>resolve(server.address().port)));}
 function close(server){return new Promise(resolve=>server.close(resolve));}
 function incomingBody(request){return new Promise((resolve,reject)=>{let chunks=[];request.on('data',data=>chunks.push(data));request.on('end',()=>resolve(Buffer.concat(chunks)));request.on('error',reject);});}

@@ -1,10 +1,10 @@
 # Universal Local HTTP Proxy
 
-Small dependency-free runtime for forwarding selected browser HTTP requests to external APIs that do not allow the AI Agents Lab browser origin. No Docker, YAML, API registration, user account or HTTPS certificate required.
+Small provider- and client-neutral local HTTP relay for browser requests to public external HTTP(S) APIs without direct CORS support. No Docker, YAML, API registration, user account or HTTPS certificate required.
 
 ## Quick start
 
-**Windows:** install Node.js 22 or newer, download/clone this repository and double-click `proxy/proxy_start_win.cmd`. On supported GitHub CI builds, you may instead download `ai-agents-local-proxy-win32-x64.exe` from workflow artifacts and run it directly without Node.js.
+**Windows:** install Node.js 22 or newer, download/clone this repository and double-click `proxy/proxy_start_win.cmd`. On supported GitHub CI builds, you may instead download `universal-local-http-proxy-win32-x64.exe` from workflow artifacts and run it directly without Node.js.
 
 **Linux/macOS:** install Node.js 22+, then run `./proxy/proxy_start_unix.sh`. Alternatively use a platform-matching executable from successful CI artifacts.
 
@@ -16,7 +16,7 @@ The port falls back to the next available port in a short range if 8080 is occup
 
 ## How it works
 
-- The AI Agents Lab UI chooses **per request** whether to use the local proxy.
+- Any trusted browser client chooses **per request** whether to use the local proxy.
 - With Proxy OFF, the browser accesses the original URL unchanged.
 - With Proxy ON, the browser sends the original method, headers and body to `http://localhost:8080/proxy` and places the original complete URL in `X-Proxy-Target-URL`.
 - The proxy validates origin, destination and DNS, then makes the outbound request and returns status, headers and a streamed body.
@@ -35,17 +35,17 @@ const result = await fetch('http://localhost:8080/proxy', {
 });
 ```
 
-Run `curl http://localhost:8080/health` to verify startup. The `/proxy` endpoint requires an approved browser Origin (curl is not authorized by default). The default allowed website is `https://ai-agents-lab.gkorobkov.ru` plus local frontend development origins.
+Run `curl http://localhost:8080/health` to verify startup. To authorize `https://client.example`, launch `node src/proxy_cli.js --allow-origin https://client.example`. The `--allow-origin` option is repeatable and `PROXY_ALLOWED_ORIGINS` supports a comma-separated list. The `/proxy` endpoint requires an approved browser Origin (curl is not authorized by default). By default only local development origins (localhost/127.0.0.1 ports 3000/5173) are allowed. Explicitly authorize other websites using `--allow-origin` or `PROXY_ALLOWED_ORIGINS`.
 
-For a curl smoke test to an external public endpoint:
+For a curl smoke test to an external public endpoint after starting with `--allow-origin https://client.example`:
 
 ```bash
-curl -i 'http://localhost:8080/proxy' -H 'Origin: https://ai-agents-lab.gkorobkov.ru' -H 'X-Proxy-Target-URL: https://example.com/'
+curl -i 'http://localhost:8080/proxy' -H 'Origin: https://client.example' -H 'X-Proxy-Target-URL: https://example.com/'
 ```
 
 ## API contract
 
-`GET /health` returns `{"status":"ok","service":"ai-agents-local-proxy","version":"1.0.0"}`.
+`GET /health` returns `{"status":"ok","service":"universal-local-http-proxy","version":"1.0.0"}`.
 
 `GET|POST|PUT|PATCH|DELETE|HEAD /proxy` uses the full target URL supplied in `X-Proxy-Target-URL`. The browser can only send the request headers allowed by Fetch. Transport-specific and hop-by-hop headers are not forwarded. Request and response bodies are passed as streams; response HTTP status is preserved. Upstream 4xx/5xx are not transformed into proxy errors. The proxy does not persist or log credentials.
 
@@ -69,7 +69,7 @@ SSE (text/event-stream), JSON, multipart/form-data, binary downloads, headers an
 ## Problems and limitations
 
 - **Browser reports CORS / Local Network Access:** check DevTools Network. Modern browsers may ask you to allow a public HTTPS site access to `localhost`. Grant access only to trusted websites. HTTP localhost works in many browsers but is not universally guaranteed.
-- **Proxy not reachable:** check the console, active port and `/health`. If the port changed, update Proxy URL in AI Agents Lab.
+- **Proxy not reachable:** check the console, active port and `/health`. If the port changed, update the proxy URL in your client application.
 - **External 401/403:** verify provider credentials. Provider authentication is not bypassed.
 - **Private destination blocked:** this is intentional. Do not disable browser security to work around it.
 - **TLS failure:** the outbound server certificate must be trusted; TLS verification is never disabled.

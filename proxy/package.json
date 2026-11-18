@@ -1,11 +1,11 @@
 {
-  "name": "ai-agents-local-proxy",
+  "name": "universal-local-http-proxy",
   "version": "1.0.0",
   "private": true,
-  "description": "Minimal secure loopback HTTP proxy for browser API labs",
+  "description": "Minimal secure loopback HTTP proxy for browser HTTP clients",
   "type": "module",
   "bin": {
-    "ai-agents-local-proxy": "./src/proxy_cli.js"
+    "universal-local-http-proxy": "./src/proxy_cli.js"
   },
   "scripts": {
     "start": "node src/proxy_cli.js",

@@ -34,11 +34,11 @@ jobs:
       - name: Smoke test executable
         shell: bash
         run: |
-          binary=$(find dist -maxdepth 1 -type f \( -name 'ai-agents-local-proxy-*' \) | head -n 1)
+          binary=$(find dist -maxdepth 1 -type f \( -name 'universal-local-http-proxy-*' \) | head -n 1)
           "$binary" --version
       - name: Upload executable
         uses: actions/upload-artifact@v4
         with:
           name: proxy-${{ matrix.os }}
-          path: proxy/dist/ai-agents-local-proxy-*
+          path: proxy/dist/universal-local-http-proxy-*
           if-no-files-found: error
