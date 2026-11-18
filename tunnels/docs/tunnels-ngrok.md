@@ -3,9 +3,9 @@
 Создайте аккаунт и получите [authtoken](https://dashboard.ngrok.com/get-started/your-authtoken). API key предназначен для API управления аккаунтом и не заменяет authtoken клиента. Установите ngrok через предложение winget или [официальный Windows архив](https://ngrok.com/downloads/windows), распакованный в пользовательский каталог PATH.
 
 ```powershell
-.\tunnels\tunnels_start_ngrok.ps1 -Port 5678 -WebhookPath /webhook/my-agent
+.\tunnels\tunnels-start-ngrok.ps1 -Port 5678 -WebhookPath /webhook/my-agent
 # Собственный существующий профиль, отдельный порт инспектора
-.\tunnels\tunnels_start_ngrok.ps1 -NgrokConfig "$env:LOCALAPPDATA\ngrok\ngrok.yml" -NgrokApiPort 45001
+.\tunnels\tunnels-start-ngrok.ps1 -NgrokConfig "$env:LOCALAPPDATA\ngrok\ngrok.yml" -NgrokApiPort 45001
 ```
 
 Скрипт проверяет конфигурацию v2/v3 без вывода её содержимого. Если профиль явно не выбран, ищет `%LOCALAPPDATA%\ngrok\ngrok.yml` и `%USERPROFILE%\.ngrok2\ngrok.yml`. Также поддерживается существующая переменная окружения `NGROK_AUTHTOKEN`. При отсутствии токена появляется скрытый запрос: введённый секрет действует только в дочернем процессе и не сохраняется на диск.

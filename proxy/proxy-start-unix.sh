@@ -11,5 +11,5 @@ if [ "$MAJOR" -lt 22 ]; then
   printf '%s\n' 'Node.js 22 or newer is required.' >&2
   exit 1
 fi
-printf '%s\n' 'Goal: launch the local HTTP proxy on loopback.' 'RUN: node src/proxy_cli.js'
-exec node src/proxy_cli.js "$@"
+printf '%s\n' 'Goal: launch the local HTTP proxy on loopback.' 'RUN: node src/proxy-cli.js'
+exec node src/proxy-cli.js "$@"

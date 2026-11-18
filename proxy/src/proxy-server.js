@@ -1,8 +1,8 @@
 import http from 'node:http';
 import crypto from 'node:crypto';
-import { ProxyError, reportError } from './proxy_errors.js';
-import { forward } from './proxy_forward.js';
-import { originAllowed, requireBrowserOrigin, safeHost } from './proxy_security.js';
+import { ProxyError, reportError } from './proxy-errors.js';
+import { forward } from './proxy-forward.js';
+import { originAllowed, requireBrowserOrigin, safeHost } from './proxy-security.js';
 
 export const DEFAULT_ORIGINS = [
   'http://localhost:3000','http://localhost:5173',

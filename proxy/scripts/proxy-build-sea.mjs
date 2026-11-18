@@ -10,7 +10,7 @@ const root=join(dirname(fileURLToPath(import.meta.url)),'..');
 const dist=join(root,'dist');
 mkdirSync(dist,{recursive:true});
 const cjs=join(dist,'proxy.bundle.cjs');
-await build({entryPoints:[join(root,'src/proxy_cli.js')],outfile:cjs,bundle:true,platform:'node',target:'node22',format:'cjs',packages:'external',banner:{js:'// Universal Local HTTP Proxy bundled for Node SEA'}});
+await build({entryPoints:[join(root,'src/proxy-cli.js')],outfile:cjs,bundle:true,platform:'node',target:'node22',format:'cjs',packages:'external',banner:{js:'// Universal Local HTTP Proxy bundled for Node SEA'}});
 const blob=join(dist,'proxy.blob');
 writeFileSync(join(dist,'sea-config.json'),JSON.stringify({main:cjs,output:blob,disableExperimentalSEAWarning:true}));
 execFileSync(process.execPath,['--experimental-sea-config',join(dist,'sea-config.json')],{stdio:'inherit'});

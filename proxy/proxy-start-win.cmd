@@ -14,6 +14,6 @@ if %NODE_MAJOR% LSS 22 (
   exit /b 1
 )
 echo Goal: launch the local HTTP proxy on loopback.
-echo RUN: node src/proxy_cli.js %*
-node src/proxy_cli.js %*
+echo RUN: node src/proxy-cli.js %*
+node src/proxy-cli.js %*
 if errorlevel 1 pause

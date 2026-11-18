@@ -4,9 +4,9 @@ Small provider- and client-neutral local HTTP relay for browser requests to publ
 
 ## Quick start
 
-**Windows:** install Node.js 22 or newer, download/clone this repository and double-click `proxy/proxy_start_win.cmd`. On supported GitHub CI builds, you may instead download `universal-local-http-proxy-win32-x64.exe` from workflow artifacts and run it directly without Node.js.
+**Windows:** install Node.js 22 or newer, download/clone this repository and double-click `proxy/proxy-start-win.cmd`. On supported GitHub CI builds, you may instead download `universal-local-http-proxy-win32-x64.exe` from workflow artifacts and run it directly without Node.js.
 
-**Linux/macOS:** install Node.js 22+, then run `./proxy/proxy_start_unix.sh`. Alternatively use a platform-matching executable from successful CI artifacts.
+**Linux/macOS:** install Node.js 22+, then run `./proxy/proxy-start-unix.sh`. Alternatively use a platform-matching executable from successful CI artifacts.
 
 The console prints the active proxy URL, typically:
 
@@ -35,7 +35,7 @@ const result = await fetch('http://localhost:8080/proxy', {
 });
 ```
 
-Run `curl http://localhost:8080/health` to verify startup. To authorize `https://client.example`, launch `node src/proxy_cli.js --allow-origin https://client.example`. The `--allow-origin` option is repeatable and `PROXY_ALLOWED_ORIGINS` supports a comma-separated list. The `/proxy` endpoint requires an approved browser Origin (curl is not authorized by default). By default only local development origins (localhost/127.0.0.1 ports 3000/5173) are allowed. Explicitly authorize other websites using `--allow-origin` or `PROXY_ALLOWED_ORIGINS`.
+Run `curl http://localhost:8080/health` to verify startup. To authorize `https://client.example`, launch `node src/proxy-cli.js --allow-origin https://client.example`. The `--allow-origin` option is repeatable and `PROXY_ALLOWED_ORIGINS` supports a comma-separated list. The `/proxy` endpoint requires an approved browser Origin (curl is not authorized by default). By default only local development origins (localhost/127.0.0.1 ports 3000/5173) are allowed. Explicitly authorize other websites using `--allow-origin` or `PROXY_ALLOWED_ORIGINS`.
 
 For a curl smoke test to an external public endpoint after starting with `--allow-origin https://client.example`:
 

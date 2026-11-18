@@ -1,13 +1,13 @@
 ﻿<#
 .SYNOPSIS
-??????? HTTPS-??????? ngrok ? ?????????? HTTP-???????.
+??????? HTTPS-??????? cloudflare ? ?????????? HTTP-???????.
 .DESCRIPTION
 ????????? ??????, ?????????? ????????? ??????? ? ??????? WEBHOOK URL.
 ??????? ???????? ?? Ctrl+C. ?? ???????? ????????? ?????????? ? ?? ?????????? POST.
 .EXAMPLE
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tunnels_start_ngrok.ps1 -Port 5678 -WebhookPath /webhook/my-agent
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tunnels-start-cloudflare.ps1 -Port 5678 -WebhookPath /webhook/my-agent
 .EXAMPLE
-.\tunnels_start_ngrok.ps1 -Port 8000 -WebhookPath '/api/hook?mode=demo' -InstallIfMissing
+.\tunnels-start-cloudflare.ps1 -Port 8000 -WebhookPath '/api/hook?mode=demo' -InstallIfMissing
 #>
 [CmdletBinding()]
 param(
@@ -17,23 +17,18 @@ param(
     [switch]$InstallIfMissing,
     [switch]$SkipPublicCheck,
     [switch]$VerboseOutput,
-
-    [ValidateRange(0, 65535)][int]$NgrokApiPort = 0,
-    [string]$NgrokConfig = '',
     [string]$HealthPath = '/',
     [ValidateRange(1, 600)][int]$StartupTimeoutSeconds = 90
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 try {
-    . (Join-Path $PSScriptRoot 'tunnels_common.ps1')
+    . (Join-Path $PSScriptRoot 'tunnels-common.ps1')
     $sessionParameters = @{
-        Provider = 'ngrok'; Port = $Port; WebhookPath = $WebhookPath; LocalHost = $LocalHost
+        Provider = 'cloudflare'; Port = $Port; WebhookPath = $WebhookPath; LocalHost = $LocalHost
         InstallIfMissing = $InstallIfMissing; SkipPublicCheck = $SkipPublicCheck
         VerboseOutput = $VerboseOutput; HealthPath = $HealthPath; StartupTimeoutSeconds = $StartupTimeoutSeconds
     }
-    $sessionParameters.NgrokApiPort = $NgrokApiPort
-    $sessionParameters.NgrokConfig = $NgrokConfig
     Start-TunnelSession @sessionParameters
 } catch {
     # Known errors are authored messages; native process output is never echoed.

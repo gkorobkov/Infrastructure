@@ -1,8 +1,8 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
-import { createProxyServer, listen } from '../src/proxy_server.js';
-import { isPublicIP, parseTarget, resolvePublicTarget, filterHeaders } from '../src/proxy_security.js';
+import { createProxyServer, listen } from '../src/proxy-server.js';
+import { isPublicIP, parseTarget, resolvePublicTarget, filterHeaders } from '../src/proxy-security.js';
 
 let upstream, server, origin, upstreamPort, proxyUrl;
 const permitted='http://localhost:5173';

@@ -2,10 +2,10 @@
 .SYNOPSIS
 Offline Pester 3+ checks. No installation, provider account or external HTTP traffic.
 .EXAMPLE
-Invoke-Pester .\tunnels\tests\tunnels_scripts.Tests.ps1
+Invoke-Pester .\tunnels\tests\tunnels-scripts.Tests.ps1
 #>
 $tunnelsRoot = Split-Path (Split-Path $MyInvocation.MyCommand.Path -Parent) -Parent
-. (Join-Path $tunnelsRoot 'tunnels_common.ps1')
+. (Join-Path $tunnelsRoot 'tunnels-common.ps1')
 
 Describe 'Tunnel input and URLs' {
     It 'accepts loopback and a query string' {
@@ -115,7 +115,7 @@ Describe 'Owned Windows client lifecycle' {
     It 'passes default parameter values through all three launchers and rejects a remote host before any action' {
         $shell = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
         foreach ($provider in @('cloudflare', 'ngrok', 'localtunnel')) {
-            $script = Join-Path $tunnelsRoot "tunnels_start_$provider.ps1"
+            $script = Join-Path $tunnelsRoot "tunnels-start-$provider.ps1"
             Write-Host "Goal: Проверить безопасный отказ точки запуска $provider"
             Write-Host "RUN: powershell.exe -NoProfile -ExecutionPolicy Bypass -File $script -LocalHost example.com"
             $output = & $shell -NoProfile -ExecutionPolicy Bypass -File $script -LocalHost example.com

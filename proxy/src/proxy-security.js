@@ -1,6 +1,6 @@
 import dns from 'node:dns/promises';
 import net from 'node:net';
-import { ProxyError } from './proxy_errors.js';
+import { ProxyError } from './proxy-errors.js';
 
 const blocked = new net.BlockList();
 for (const [network, prefix] of [

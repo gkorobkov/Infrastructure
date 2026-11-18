@@ -5,13 +5,13 @@
   "description": "Minimal secure loopback HTTP proxy for browser HTTP clients",
   "type": "module",
   "bin": {
-    "universal-local-http-proxy": "./src/proxy_cli.js"
+    "universal-local-http-proxy": "./src/proxy-cli.js"
   },
   "scripts": {
-    "start": "node src/proxy_cli.js",
-    "test": "node --test test/*_test.js",
-    "check": "node --check src/proxy_cli.js && node --check src/proxy_server.js && node --check src/proxy_security.js && node --check src/proxy_forward.js && npm test",
-    "build:sea": "node scripts/proxy_build_sea.mjs"
+    "start": "node src/proxy-cli.js",
+    "test": "node --test test/*-test.js",
+    "check": "node --check src/proxy-cli.js && node --check src/proxy-server.js && node --check src/proxy-security.js && node --check src/proxy-forward.js && npm test",
+    "build:sea": "node scripts/proxy-build-sea.mjs"
   },
   "engines": {
     "node": ">=22"

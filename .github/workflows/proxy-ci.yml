@@ -3,11 +3,11 @@ on:
   push:
     paths:
       - 'proxy/**'
-      - '.github/workflows/proxy_ci.yml'
+      - '.github/workflows/proxy-ci.yml'
   pull_request:
     paths:
       - 'proxy/**'
-      - '.github/workflows/proxy_ci.yml'
+      - '.github/workflows/proxy-ci.yml'
   workflow_dispatch:
 
 jobs:

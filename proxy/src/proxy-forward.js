@@ -1,8 +1,8 @@
 import http from 'node:http';
 import https from 'node:https';
 import { pipeline } from 'node:stream/promises';
-import { ProxyError } from './proxy_errors.js';
-import { filterHeaders, parseTarget, resolvePublicTarget } from './proxy_security.js';
+import { ProxyError } from './proxy-errors.js';
+import { filterHeaders, parseTarget, resolvePublicTarget } from './proxy-security.js';
 
 const redirects = new Set([301,302,303,307,308]);
 function upstreamError(error) {

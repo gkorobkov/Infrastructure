@@ -1,6 +1,6 @@
 ﻿<#
 .SYNOPSIS
-Shared tunnel checks and process supervision. Import from a tunnels_start_* script.
+Shared tunnel checks and process supervision. Import from a tunnels-start-* script.
 .DESCRIPTION
 No server is started, no webhook POST is sent, and no application settings are changed.
 #>
@@ -145,7 +145,7 @@ function Install-TunnelTool {
 function New-TunnelClient {
     param([string]$Executable, [string[]]$Arguments, [hashtable]$Environment = @{})
     if (-not ('InfrastructureTunnels.Client' -as [type])) {
-        Add-Type -Path (Join-Path $PSScriptRoot 'tunnels_process.cs')
+        Add-Type -Path (Join-Path $PSScriptRoot 'tunnels-process.cs')
     }
     $info = New-Object Diagnostics.ProcessStartInfo
     $info.FileName = $Executable

@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 // Generic loopback HTTP proxy. External web origins require explicit approval.
-import { createProxyServer, listen, DEFAULT_ORIGINS } from './proxy_server.js';
+import { createProxyServer, listen, DEFAULT_ORIGINS } from './proxy-server.js';
 
 const VERSION = '1.0.0';
 const args = process.argv.slice(2);
 const help = `Universal Local HTTP Proxy
-Usage: node src/proxy_cli.js [--port 8080] [--allow-origin https://client.example] [--help] [--version]
+Usage: node src/proxy-cli.js [--port 8080] [--allow-origin https://client.example] [--help] [--version]
 
 Options:
   --port PORT         Listening port (default: 8080; next 10 ports as fallback)
@@ -17,7 +17,7 @@ Environment:
   PROXY_ALLOWED_ORIGINS  Additional comma-separated exact HTTP(S) origins
 
 No public websites are authorized by default.
-Example: node src/proxy_cli.js --allow-origin https://client.example`;
+Example: node src/proxy-cli.js --allow-origin https://client.example`;
 if (args.includes('--help') || args.includes('-h')) { console.log(help); process.exit(0); }
 if (args.includes('--version')) { console.log(VERSION); process.exit(0); }
 

@@ -15,7 +15,7 @@ Web UI может находиться на любом внешнем HTTPS-ад
 
 TLS завершается у провайдера, поэтому сертификат на localhost не требуется. Скрипт публикует весь локальный HTTP-сервер, а не только указанный webhook: `WebhookPath` служит для формирования ссылки. Доступ к UI и другим маршрутам регулируется самим приложением.
 
-Три файла `tunnels_start_*.ps1` вызывают общие функции из `tunnels_common.ps1`. Небольшой C#-компонент `tunnels_process.cs` читает stdout/stderr асинхронно и связывает клиент и его потомков с Windows Job Object. Скрипт остаётся работать до Ctrl+C или завершения клиента; при выходе закрывает принадлежащий ему Job. Другие процессы не останавливаются. URL не записывается в проект.
+Три файла `tunnels-start-*.ps1` вызывают общие функции из `tunnels-common.ps1`. Небольшой C#-компонент `tunnels-process.cs` читает stdout/stderr асинхронно и связывает клиент и его потомков с Windows Job Object. Скрипт остаётся работать до Ctrl+C или завершения клиента; при выходе закрывает принадлежащий ему Job. Другие процессы не останавливаются. URL не записывается в проект.
 
 ## Выбор провайдера
 
@@ -38,9 +38,9 @@ Windows 10/11, Windows PowerShell 5.1 или PowerShell 7, работающий 
 Запустите приложение, затем из корня репозитория выберите **один** вариант:
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tunnels\tunnels_start_cloudflare.ps1
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tunnels\tunnels_start_ngrok.ps1
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tunnels\tunnels_start_localtunnel.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tunnels\tunnels-start-cloudflare.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tunnels\tunnels-start-ngrok.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tunnels\tunnels-start-localtunnel.ps1
 ```
 
 Сначала проверьте источник скриптов. `-ExecutionPolicy Bypass` относится только к новому процессу PowerShell и не меняет глобальную политику. Для PowerShell 7 замените `powershell.exe` на `pwsh`.
@@ -51,13 +51,13 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tunnels\tunnels_start_
 
 ```powershell
 # FastAPI на порту 8000; health endpoint без побочных эффектов
-.\tunnels\tunnels_start_cloudflare.ps1 -Port 8000 -WebhookPath '/api/hook?mode=demo' -HealthPath /health -InstallIfMissing
+.\tunnels\tunnels-start-cloudflare.ps1 -Port 8000 -WebhookPath '/api/hook?mode=demo' -HealthPath /health -InstallIfMissing
 
 # Тестовый webhook n8n
-.\tunnels\tunnels_start_ngrok.ps1 -WebhookPath /webhook-test/my-agent -NgrokApiPort 45001
+.\tunnels\tunnels-start-ngrok.ps1 -WebhookPath /webhook-test/my-agent -NgrokApiPort 45001
 
 # Увеличенное время ожидания и диагностика без сырых логов клиента
-.\tunnels\tunnels_start_localtunnel.ps1 -StartupTimeoutSeconds 180 -VerboseOutput
+.\tunnels\tunnels-start-localtunnel.ps1 -StartupTimeoutSeconds 180 -VerboseOutput
 ```
 
 | Параметр | Значение по умолчанию / назначение |
@@ -100,12 +100,12 @@ HTTPS-туннель не добавляет CORS-заголовки. Для б�
 
 ## Диагностика и проверки
 
-См. [Cloudflare](docs/tunnels_cloudflare.md), [ngrok](docs/tunnels_ngrok.md), [localtunnel](docs/tunnels_localtunnel.md) и [разбор ошибок](docs/tunnels_troubleshooting.md).
+См. [Cloudflare](docs/tunnels-cloudflare.md), [ngrok](docs/tunnels-ngrok.md), [localtunnel](docs/tunnels-localtunnel.md) и [разбор ошибок](docs/tunnels-troubleshooting.md).
 
 Автоматические проверки без установки программ и реальных аккаунтов:
 
 ```powershell
-Invoke-Pester .\tunnels\tests\tunnels_scripts.Tests.ps1
+Invoke-Pester .\tunnels\tests\tunnels-scripts.Tests.ps1
 ```
 
 Они проверяют входные данные, URL/query string, отказы HTTP/TCP, согласие на установку, API ngrok с mock-ответами, таймаут и завершение собственного процесса с большим stdout/stderr. Реальный сетевой smoke test выполняется отдельно:

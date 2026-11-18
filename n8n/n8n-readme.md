@@ -12,29 +12,29 @@
 
 # Local n8n for macOS
 
-Use `n8n_docker_compose_deploy_mac.command` in Finder or run the following from the repository root in Terminal:
+Use `n8n-docker-compose-deploy-mac.command` in Finder or run the following from the repository root in Terminal:
 
 ```bash
-bash n8n/n8n_docker_compose_deploy_mac.sh
+bash n8n/n8n-docker-compose-deploy-mac.sh
 ```
 
 For Finder, first allow execution once in Terminal:
 
 ```bash
-chmod +x n8n/n8n_docker_compose_deploy_mac.command
+chmod +x n8n/n8n-docker-compose-deploy-mac.command
 ```
 
 Keep all files together. The launcher uses macOS's built-in Bash and supports Intel and Apple silicon through Docker Desktop's native image selection. It starts Docker Desktop, waits for its Linux engine, validates Compose, pulls the configured images, starts n8n and the external runner, waits for HTTP readiness and opens `http://localhost:5678/`. Set `N8N_OPEN_BROWSER=false` to skip browser opening. Create the owner account on the first visit.
 
 If Docker is missing, the launcher asks before opening the official installation page. Install the download matching your processor, drag Docker to Applications, open it and complete onboarding, then rerun the launcher. Installation and license acceptance are interactive. See [Docker's macOS installation instructions and current requirements](https://docs.docker.com/desktop/setup/install/mac-install/). No Homebrew, WSL or PowerShell is required. The launcher supports Docker in `/Applications` or your user's `Applications` directory and always targets `desktop-linux`.
 
-The Mac and Windows launchers share `.env.local.example`, `.env.local` and `n8n_compose_local.yaml`. Windows-only env settings are ignored on macOS. Existing encryption keys and runner tokens are preserved; exact `GENERATE_ON_FIRST_RUN` placeholders receive separate random secrets. Do not move an existing database without its original encryption key. The Mac launcher refuses to generate a replacement encryption key when `VLM_DATA` is already populated. It accepts `N8N_DATA_PATH=./VLM_DATA` only and rejects a symbolic link for that directory. There is no automatic storage migration.
+The Mac and Windows launchers share `.env.local.example`, `.env.local` and `n8n-compose-local.yaml`. Windows-only env settings are ignored on macOS. Existing encryption keys and runner tokens are preserved; exact `GENERATE_ON_FIRST_RUN` placeholders receive separate random secrets. Do not move an existing database without its original encryption key. The Mac launcher refuses to generate a replacement encryption key when `VLM_DATA` is already populated. It accepts `N8N_DATA_PATH=./VLM_DATA` only and rejects a symbolic link for that directory. There is no automatic storage migration.
 
 Run these from any working directory using the actual path to the script:
 
 ```bash
-bash n8n/n8n_docker_compose_deploy_mac.sh check  # Initialize/validate settings; no Docker startup
-bash n8n/n8n_docker_compose_deploy_mac.sh status # Inspect Docker engine; no installation or startup
+bash n8n/n8n-docker-compose-deploy-mac.sh check  # Initialize/validate settings; no Docker startup
+bash n8n/n8n-docker-compose-deploy-mac.sh status # Inspect Docker engine; no installation or startup
 ```
 
 `check` creates `.env.local` if missing and resolves placeholders, so it changes local configuration. It does not render Compose. The Bash parser accepts `N8N_NAME=value` with optional enclosing quotes; it never executes shell expressions. Keep paths and values literal, without inline comments or variable expansion. The env file is saved with owner-only permissions. The UI binds to `127.0.0.1` only; a remote Docker context is rejected.
@@ -43,16 +43,16 @@ Use Ctrl+C to interrupt this launch. It does not stop Docker Desktop or containe
 
 ```bash
 cd n8n
-docker --context desktop-linux compose --env-file .env.local -f n8n_compose_local.yaml -p n8n-cmpsprj down
+docker --context desktop-linux compose --env-file .env.local -f n8n-compose-local.yaml -p n8n-cmpsprj down
 ```
 
 Use your configured `N8N_PROJECT_NAME` if changed. Rerun the launcher to start again. Back up `.env.local` and `VLM_DATA` together with n8n stopped. If Docker times out, complete its onboarding; if n8n times out, inspect its container logs in Docker Desktop. If the port is occupied, change `N8N_PORT` in `.env.local`. The directory lock `.n8n_macos_lock` is removed on normal exit and Ctrl+C. After a power loss, remove that empty lock directory only after confirming no launcher from this directory is running. macOS has no `cancel` argument that terminates other processes.
 
-Verification: `bash n8n/n8n_test_macos.sh` runs isolated configuration and mocked deployment checks without installing software or starting containers. Real macOS installation, Finder permissions, Docker onboarding and native container execution still require testing on a Mac.
+Verification: `bash n8n/n8n-test-macos.sh` runs isolated configuration and mocked deployment checks without installing software or starting containers. Real macOS installation, Finder permissions, Docker onboarding and native container execution still require testing on a Mac.
 
 # Local n8n for Windows 11 Users
 
-**Double-click `n8n_docker_compose_deploy_win.cmd`.** Keep the other files in the same `n8n` directory. You do not need a server, domain, Kubernetes, PostgreSQL, or manually generated passwords for this local setup.
+**Double-click `n8n-docker-compose-deploy-win.cmd`.** Keep the other files in the same `n8n` directory. You do not need a server, domain, Kubernetes, PostgreSQL, or manually generated passwords for this local setup.
 
 The launcher checks Windows and virtualization, prepares WSL when necessary, installs Docker Desktop if it is missing, starts its Linux engine, and deploys n8n plus an external task runner. It creates `.env.local` and generates separate encryption/token values automatically. The browser opens after the readiness check succeeds:
 
@@ -102,24 +102,24 @@ Double-click is sufficient. If you prefer Windows PowerShell, run the following 
 
 ```powershell
 # Windows 11 PowerShell.
-.\n8n_docker_compose_deploy_win.cmd
+.\n8n-docker-compose-deploy-win.cmd
 # Expected: Local n8n is ready. Open: http://localhost:5678/
 # If setup stops, read the displayed error and rerun the same launcher after resolving it.
 ```
 
 The console stays open after errors. If Windows prerequisite preparation fails, see `.local-prerequisites.log` in this directory. If containers fail to start, the launcher prints their recent logs. When the engine wait times out, complete Docker Desktop's onboarding and launch the file again.
 
-If another setup is running, the console prints a timestamped process snapshot and executable status/cancellation commands. PIDs can disappear after that snapshot: do not copy an old PID into taskkill. From the n8n directory, run `n8n_docker_compose_deploy_win.cmd status` to query current processes (approve UAC). If no setup exists now, the console says so and you can launch normally. To cancel a setup, run `n8n_docker_compose_deploy_win.cmd cancel`; it requests UAC, finds only prerequisite setup from this directory, and rechecks the process command and creation time before cancellation. Exited/reused PIDs and other copies are skipped. This cancels prerequisite work and its children but does not delete n8n data. Neither command installs Docker or changes Windows features. New Administrator windows are titled `n8n setup - Administrator - PID <number>`. The log command printed by the console is optional; no Task Manager search is required.
+If another setup is running, the console prints a timestamped process snapshot and executable status/cancellation commands. PIDs can disappear after that snapshot: do not copy an old PID into taskkill. From the n8n directory, run `n8n-docker-compose-deploy-win.cmd status` to query current processes (approve UAC). If no setup exists now, the console says so and you can launch normally. To cancel a setup, run `n8n-docker-compose-deploy-win.cmd cancel`; it requests UAC, finds only prerequisite setup from this directory, and rechecks the process command and creation time before cancellation. Exited/reused PIDs and other copies are skipped. This cancels prerequisite work and its children but does not delete n8n data. Neither command installs Docker or changes Windows features. New Administrator windows are titled `n8n setup - Administrator - PID <number>`. The log command printed by the console is optional; no Task Manager search is required.
 
 ## Files and verification
 
-`n8n_docker_compose_deploy_win.cmd` is the entry point. It calls `n8n_docker_compose_deploy_win.ps1`, which uses `n8n_compose_local.yaml` and `.env.local`. SQLite data lives in the local `./VLM_DATA` directory through an explicit bind mount at `/home/node/.n8n`. The local configuration stays in `.env.local`; no runtime server configuration is included in this repository.
+`n8n-docker-compose-deploy-win.cmd` is the entry point. It calls `n8n-docker-compose-deploy-win.ps1`, which uses `n8n-compose-local.yaml` and `.env.local`. SQLite data lives in the local `./VLM_DATA` directory through an explicit bind mount at `/home/node/.n8n`. The local configuration stays in `.env.local`; no runtime server configuration is included in this repository.
 
 The verification script checks configuration, generated-key stability, loopback restrictions, context restrictions and Compose rendering without installing software or starting containers:
 
 ```powershell
 # Windows 11 PowerShell, from the n8n directory.
-powershell -NoProfile -ExecutionPolicy Bypass -File .\n8n_test_local.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\n8n-test-local.ps1
 # Expected: Local launcher checks passed; no software installed and no containers started.
 # If a check fails, read the reported error to identify the configuration problem.
 ```
@@ -135,4 +135,4 @@ Local webhook configuration will be added separately. This directory does not ye
 
 ## Local storage and backups
 
-Persistent storage uses an explicit bind mount from `N8N_DATA_PATH=./VLM_DATA` to `/home/node/.n8n`. Relative paths resolve from the directory containing `n8n_compose_local.yaml`, even when launching from another directory. Keep the data directory and the original encryption key together when backing up or moving the installation. If an earlier deployment used a Docker-managed volume, copy its data into this directory with n8n stopped before starting with the bind mount; changing the mount alone does not transfer existing data.
+Persistent storage uses an explicit bind mount from `N8N_DATA_PATH=./VLM_DATA` to `/home/node/.n8n`. Relative paths resolve from the directory containing `n8n-compose-local.yaml`, even when launching from another directory. Keep the data directory and the original encryption key together when backing up or moving the installation. If an earlier deployment used a Docker-managed volume, copy its data into this directory with n8n stopped before starting with the bind mount; changing the mount alone does not transfer existing data.

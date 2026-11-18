@@ -6,7 +6,7 @@ localtunnel запускается через npx без глобальной у
 node --version
 npm.cmd --version
 npx.cmd --version
-.\tunnels\tunnels_start_localtunnel.ps1 -Port 5678 -WebhookPath /webhook/my-agent
+.\tunnels\tunnels-start-localtunnel.ps1 -Port 5678 -WebhookPath /webhook/my-agent
 ```
 
 Сначала проверяется доступность npm registry. Перед запуском пользователь разрешает npx скачать и выполнить пакет; `-InstallIfMissing` заранее разрешает это действие. Используется официальный npm registry и эквивалент `npx --yes --package=localtunnel -- lt --port 5678 --local-host 127.0.0.1`. В Windows скрипт вызывает `npx-cli.js` через `node.exe`, чтобы не интерпретировать параметры через cmd.exe. Старый npm без `--yes` нужно обновить вместе с Node.js LTS. Нестандартная раскладка npx без соседнего `node_modules/npm/bin/npx-cli.js` не поддерживается.

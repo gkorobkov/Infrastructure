@@ -1,12 +1,12 @@
 #!/bin/bash
 # Verify macOS launcher configuration and deployment with isolated command mocks.
-# Usage/example (from repository root): bash n8n/n8n_test_macos.sh
+# Usage/example (from repository root): bash n8n/n8n-test-macos.sh
 set -eo pipefail
 root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 work=$(mktemp -d)
 trap 'rm -rf -- "$work"' EXIT
 mkdir -p "$work/project with spaces" "$work/bin"
-cp "$root/n8n_docker_compose_deploy_mac.sh" "$root/.env.local.example" "$root/n8n_compose_local.yaml" "$work/project with spaces/"
+cp "$root/n8n-docker-compose-deploy-mac.sh" "$root/.env.local.example" "$root/n8n-compose-local.yaml" "$work/project with spaces/"
 project="$work/project with spaces"
 cat > "$work/bin/uname" <<'EOF'
 #!/bin/bash
@@ -25,7 +25,7 @@ cp "$work/bin/open" "$work/bin/curl"
 chmod +x "$work/bin/"*
 export PATH="$work/bin:$PATH"
 export N8N_TEST_TRACE="$work/trace"
-launch() { bash "$project/n8n_docker_compose_deploy_mac.sh" "$@"; }
+launch() { bash "$project/n8n-docker-compose-deploy-mac.sh" "$@"; }
 reject() {
     if launch check > "$work/rejected.log" 2>&1; then echo 'Expected rejection' >&2; exit 1; fi
     [[ ! -d "$project/.n8n_macos_lock" ]]

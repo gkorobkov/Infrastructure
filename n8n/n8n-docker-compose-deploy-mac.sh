@@ -1,7 +1,7 @@
 #!/bin/bash
 # Deploy local n8n and its task runner on macOS (Intel or Apple silicon).
-# Usage: bash n8n_docker_compose_deploy_mac.sh [check|status]
-# Example: bash ~/Infrastructure/n8n/n8n_docker_compose_deploy_mac.sh
+# Usage: bash n8n-docker-compose-deploy-mac.sh [check|status]
+# Example: bash ~/Infrastructure/n8n/n8n-docker-compose-deploy-mac.sh
 # check validates configuration only; status queries Docker without starting it.
 set -eo pipefail
 umask 077
@@ -17,13 +17,13 @@ run() {
 root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 cd -- "$root"
 mode=${1:-deploy}
-[[ $# -le 1 ]] || fail 'Usage: n8n_docker_compose_deploy_mac.sh [check|status]'
-case "$mode" in deploy|check|status) ;; *) fail 'Usage: n8n_docker_compose_deploy_mac.sh [check|status]; use Ctrl+C to interrupt this launch.' ;; esac
+[[ $# -le 1 ]] || fail 'Usage: n8n-docker-compose-deploy-mac.sh [check|status]'
+case "$mode" in deploy|check|status) ;; *) fail 'Usage: n8n-docker-compose-deploy-mac.sh [check|status]; use Ctrl+C to interrupt this launch.' ;; esac
 [[ $(run 'Identify the operating system.' uname -s | tail -n 1) == Darwin ]] || fail 'This launcher requires macOS.'
 # Finder may not inherit the terminal PATH; use Docker Desktop bundled tools.
 export PATH="/Applications/Docker.app/Contents/Resources/bin:$HOME/Applications/Docker.app/Contents/Resources/bin:$HOME/.docker/bin:$PATH"
 env_file="$root/.env.local"
-compose_file="$root/n8n_compose_local.yaml"
+compose_file="$root/n8n-compose-local.yaml"
 
 if [[ $mode == status ]]; then
     command -v docker >/dev/null || fail 'Docker CLI not found. Install Docker Desktop.'
