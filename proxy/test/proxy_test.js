@@ -82,11 +82,15 @@ test('redirect follows safely',async()=>{
   assert.equal(r.status,200);assert.equal(await r.text(),'redirected');
 });
 test('target URL validation and private IPv4/IPv6 blocked',async()=>{
-  for(const url of ['http://127.0.0.1/','http://192.168.1.2/','http://[::1]/','http://169.254.169.254/']){
-    const r=await fetch(proxyUrl+'/proxy',{headers:proxyHeaders(url)});
-    // Unit test transport injection deliberately bypasses real protection; verify it separately below.
-    assert.ok([200,502].includes(r.status));
-  }
+  // Test forbidden targets with production DNS/address policy (no injected resolver).
+  const protectedServer=createProxyServer({port:0});
+  const protectedPort=await listen(protectedServer,0);
+  try {
+    for(const url of ['http://127.0.0.1/','http://192.168.1.2/','http://[::1]/','http://169.254.169.254/']) {
+      const r=await fetch('http://127.0.0.1:'+protectedPort+'/proxy',{headers:proxyHeaders(url)});
+      assert.equal(r.status,403,'Must reject '+url);
+    }
+  } finally { await close(protectedServer); }
   for(const address of ['127.0.0.1','192.168.3.3','10.0.0.1','169.254.169.254','::1','fe80::1','fc00::1','::ffff:127.0.0.1'])assert.equal(isPublicIP(address),false,address);
   assert.equal(isPublicIP('1.1.1.1'),true);
   assert.throws(()=>parseTarget('file:///etc/passwd'));
