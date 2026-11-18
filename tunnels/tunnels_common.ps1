@@ -341,7 +341,7 @@ function Start-TunnelSession {
             else { Write-TunnelMessage WARN 'Публичный HTTPS не ответил: возможна задержка DNS/TLS, proxy/VPN или блокировка. Туннель оставлен работать; повторите GET вручную.' }
         } else { Write-TunnelMessage WARN 'Публичная HTTPS-проверка пропущена.' }
         Write-Host "========================================`nURL RECEIVED`nProvider: $Provider`nLocal server: $origin`nPublic URL: $url`nWEBHOOK URL: $(Join-TunnelWebhook $url $WebhookPath)`n========================================"
-        Write-TunnelMessage INFO 'Скопируйте WEBHOOK URL в ваш Web UI, например AI Agents Lab: https://ai-agents-lab.gkorobkov.ru/index.html . Можно использовать другой внешний клиент. Для браузерных запросов проверьте CORS/OPTIONS в приложении.'
+        Write-TunnelMessage INFO 'Скопируйте WEBHOOK URL в ваш Web UI. Можно использовать другой внешний клиент. Для браузерных запросов проверьте CORS/OPTIONS в приложении.'
         Write-TunnelMessage WARN 'Webhook POST не выполнялся; работоспособность workflow не подтверждена. localtunnel/ngrok могут показывать страницу подтверждения.'
         Write-TunnelMessage INFO 'Туннель работает, пока запущен скрипт. Для остановки нажмите Ctrl+C.'
         while (-not $client.Process.HasExited) {

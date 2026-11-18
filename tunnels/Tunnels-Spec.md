@@ -312,9 +312,7 @@ https://example.trycloudflare.com
 WEBHOOK URL:
 https://example.trycloudflare.com/webhook/my-agent
 
-Скопируйте WEBHOOK URL в Web UI:
-например, AI Agents Lab: https://ai-agents-lab.gkorobkov.ru/index.html
-или в другой внешний клиент.
+Скопируйте WEBHOOK URL в Web UI.
 
 Статус:
 - Локальный сервер: доступен
@@ -602,8 +600,6 @@ Web UI не привязан к конкретному сайту. Обозна�
 ```text
 Web UI https://service-name.ru
 ```
-
-При объяснении, куда скопировать WEBHOOK URL, можно привести пример [AI Agents Lab](https://ai-agents-lab.gkorobkov.ru/index.html). Этот сайт не является обязательной частью архитектуры; допускается любой другой внешний клиент.
 
 Пользователь должен:
 
