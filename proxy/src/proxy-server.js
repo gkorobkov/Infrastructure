@@ -35,7 +35,7 @@ export function createProxyServer(options={}) {
       const localPort=server.address()?.port || config.port;
       if(!safeHost(request.headers.host,localPort)) throw new ProxyError(403,'PROXY_HOST_FORBIDDEN','Invalid Host header.');
       if(request.url==='/health' && request.method==='GET') {
-        const result=Buffer.from(JSON.stringify({status:'ok',service:'universal-local-http-proxy',version:'1.0.0'}));
+        const result=Buffer.from(JSON.stringify({status:'ok',service:'universal-http-proxy',version:'1.0.0'}));
         response.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Content-Length':result.length,'Cache-Control':'no-store'});response.end(result);return;
       }
       if(request.url!=='/proxy') throw new ProxyError(404,'PROXY_NOT_FOUND','Unknown proxy endpoint.');

@@ -42,7 +42,7 @@ export function parseTarget(value) {
 export async function resolvePublicTarget(url, lookup = dns.lookup) {
   const host = url.hostname.replace(/^\[|\]$/g, '').replace(/\.$/, '');
   if (!host || host.toLowerCase() === 'localhost' || host.toLowerCase().endsWith('.localhost') || host.toLowerCase().endsWith('.local')) {
-    throw new ProxyError(403, 'PROXY_TARGET_FORBIDDEN', 'Local targets are blocked.');
+    throw new ProxyError(403, 'PROXY_TARGET_FORBIDDEN', 'Loopback and private targets are blocked.');
   }
   const ipFamily = net.isIP(host);
   let addresses;

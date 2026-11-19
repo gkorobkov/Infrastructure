@@ -6,6 +6,11 @@ import { isPublicIP, parseTarget, resolvePublicTarget, filterHeaders } from '../
 
 let upstream, server, origin, upstreamPort, proxyUrl;
 const permitted='http://localhost:5173';
+
+test('health uses the general product identifier', async()=>{
+  const response = await fetch(proxyUrl + '/health');
+  assert.equal((await response.json()).service, 'universal-http-proxy');
+});
 function bind(server){return new Promise(resolve=>server.listen(0,'127.0.0.1',()=>resolve(server.address().port)));}
 function close(server){return new Promise(resolve=>server.close(resolve));}
 function incomingBody(request){return new Promise((resolve,reject)=>{let chunks=[];request.on('data',data=>chunks.push(data));request.on('end',()=>resolve(Buffer.concat(chunks)));request.on('error',reject);});}

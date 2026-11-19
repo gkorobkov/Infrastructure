@@ -1,4 +1,4 @@
-name: Local proxy CI
+name: HTTP proxy CI
 on:
   push:
     paths:
@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-15, macos-15-intel]
     defaults:
       run:
         working-directory: proxy
@@ -27,6 +27,23 @@ jobs:
           node-version: '22'
       - name: Test proxy
         run: npm test
+      - name: Check Unix launcher
+        if: runner.os != 'Windows'
+        run: sh proxy-start-unix.sh --version
+      - name: Check Windows launcher
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: .\proxy-start-win.ps1 --version
+      - name: Check actual Mac runtime download and reuse without system Node
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          work=$(mktemp -d)
+          mkdir -p "$work/proxy with spaces"
+          cp proxy-start-unix.sh "$work/proxy with spaces/"
+          cp -R src "$work/proxy with spaces/"
+          printf '\n' | PATH=/usr/bin:/bin:/usr/sbin:/sbin /bin/sh "$work/proxy with spaces/proxy-start-unix.sh" --version
+          PATH=/usr/bin:/bin:/usr/sbin:/sbin /bin/sh "$work/proxy with spaces/proxy-start-unix.sh" --version < /dev/null
       - name: Install development dependencies
         run: npm install --no-audit --no-fund
       - name: Build self-contained executable
@@ -34,11 +51,11 @@ jobs:
       - name: Smoke test executable
         shell: bash
         run: |
-          binary=$(find dist -maxdepth 1 -type f \( -name 'universal-local-http-proxy-*' \) | head -n 1)
+          binary=$(find dist -maxdepth 1 -type f \( -name 'universal-http-proxy-*' \) | head -n 1)
           "$binary" --version
       - name: Upload executable
         uses: actions/upload-artifact@v4
         with:
           name: proxy-${{ matrix.os }}
-          path: proxy/dist/universal-local-http-proxy-*
+          path: proxy/dist/universal-http-proxy-*
           if-no-files-found: error

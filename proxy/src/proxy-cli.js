@@ -4,7 +4,7 @@ import { createProxyServer, listen, DEFAULT_ORIGINS } from './proxy-server.js';
 
 const VERSION = '1.0.0';
 const args = process.argv.slice(2);
-const help = `Universal Local HTTP Proxy
+const help = `Universal HTTP Proxy
 Usage: node src/proxy-cli.js [--port 8080] [--allow-origin https://client.example] [--help] [--version]
 
 Options:
@@ -57,10 +57,10 @@ async function main() {
   const server = createProxyServer({port, allowedOrigins});
   try {
     const actual = await listen(server, port);
-    console.log(`Universal Local HTTP Proxy v${VERSION}
+    console.log(`Universal HTTP Proxy v${VERSION}
 [OK] Listening on 127.0.0.1:${actual}
 
-Local Proxy URL: http://localhost:${actual}
+Proxy URL: http://localhost:${actual}
 Health: http://localhost:${actual}/health
 
 Allowed browser origins:
@@ -71,7 +71,7 @@ Press Ctrl+C to stop.`);
     for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => {
       if (closing) return;
       closing = true;
-      console.log('\nStopping local proxy...');
+      console.log('\nStopping proxy...');
       server.close(() => process.exit(0));
       setTimeout(() => { server.closeAllConnections(); process.exit(0); }, 5000).unref();
     });
