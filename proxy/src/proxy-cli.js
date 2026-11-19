@@ -2,6 +2,26 @@
 // Generic loopback HTTP proxy. External web origins require explicit approval.
 import { createProxyServer, listen, DEFAULT_ORIGINS } from './proxy-server.js';
 
+import { appendFileSync, mkdirSync, statSync, renameSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+
+const logPath = resolve(process.env.PROXY_LOG_PATH || 'logs/proxy.log');
+let log;
+try {
+  mkdirSync(dirname(logPath), {recursive: true});
+  if (statSync(logPath, {throwIfNoEntry: false})?.size > 5 * 1024 * 1024) renameSync(logPath, logPath + '.1');
+  appendFileSync(logPath, '', {mode: 0o600});
+  log = entry => {
+    const line = JSON.stringify({time: new Date().toISOString(), ...entry});
+    console.log(line);
+    try { appendFileSync(logPath, line + '\n'); }
+    catch { console.error('[ERROR] Unable to write proxy log file.'); }
+  };
+} catch {
+  console.error('[ERROR] Unable to create proxy log file: ' + logPath);
+  process.exit(1);
+}
+
 const VERSION = '1.0.0';
 const args = process.argv.slice(2);
 const help = `Universal HTTP Proxy
@@ -15,6 +35,7 @@ Options:
 
 Environment:
   PROXY_ALLOWED_ORIGINS  Additional comma-separated exact HTTP(S) origins
+  PROXY_LOG_PATH         Log file (default: logs/proxy.log relative to working directory)
 
 No public websites are authorized by default.
 Example: node src/proxy-cli.js --allow-origin https://client.example`;
@@ -46,24 +67,28 @@ try {
   }
   if (!Number.isInteger(port) || port < 1024 || port > 65525) throw Error('Invalid port (1024–65525).');
 } catch (error) {
+  log({event: 'configuration-error'});
   console.error(error.message);
   process.exit(1);
 }
 let allowedOrigins;
 try { allowedOrigins = [...new Set([...DEFAULT_ORIGINS, ...additional.map(parseOrigin)])]; }
-catch (error) { console.error(error.message); process.exit(1); }
+catch (error) { log({event: 'configuration-error'}); console.error(error.message); process.exit(1); }
 
 async function main() {
-  const server = createProxyServer({port, allowedOrigins});
+  const server = createProxyServer({port, allowedOrigins, logger: log});
   try {
     const actual = await listen(server, port);
+    log({event: 'started', port: actual});
     console.log(`Universal HTTP Proxy v${VERSION}
 [OK] Listening on 127.0.0.1:${actual}
 
 Proxy URL: http://localhost:${actual}
 Health: http://localhost:${actual}/health
 
-Allowed browser origins:
+Log file: ${logPath}
+Loopback browser origins: HTTP(S) localhost / 127.0.0.1 / [::1], any port
+Additional exact browser origins:
 ${allowedOrigins.map(o => '  ' + o).join('\n')}
 
 Press Ctrl+C to stop.`);
@@ -71,11 +96,12 @@ Press Ctrl+C to stop.`);
     for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => {
       if (closing) return;
       closing = true;
-      console.log('\nStopping proxy...');
+      log({event: 'stopping'});
       server.close(() => process.exit(0));
       setTimeout(() => { server.closeAllConnections(); process.exit(0); }, 5000).unref();
     });
   } catch (error) {
+    log({event: 'startup-error', code: /^[A-Z0-9_]+$/.test(error.code || '') ? error.code : 'START_FAILED'});
     console.error('Unable to start proxy:', error.message);
     process.exitCode = 1;
   }

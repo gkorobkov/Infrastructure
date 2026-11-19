@@ -105,3 +105,31 @@ test('request header filtering removes routing and browser headers',()=>{
   const actual=filterHeaders({host:'x',origin:'https://example.test','x-proxy-target-url':'url',authorization:'x',connection:'x-evil', 'x-evil':'yes', 'content-type':'application/json'},'request');
   assert.deepEqual(actual,{authorization:'x','content-type':'application/json'});
 });
+
+
+test('dynamic loopback port health, preflight and relay', async()=>{
+  const browserOrigin='http://localhost:52268';
+  for(const endpoint of ['/health','/proxy']) {
+    const r=await fetch(proxyUrl+endpoint,{headers:proxyHeaders(origin,{Origin:browserOrigin})});
+    assert.equal(r.status,200);
+    assert.equal(r.headers.get('access-control-allow-origin'),browserOrigin);
+    await r.text();
+  }
+  const r=await fetch(proxyUrl+'/proxy',{method:'OPTIONS',headers:{Origin:browserOrigin,'Access-Control-Request-Method':'GET','Access-Control-Request-Headers':'api-key, x-proxy-target-url'}});
+  assert.equal(r.status,204);
+});
+
+test('request logs contain rejection and request ID',async()=>{
+  const entries=[];
+  const logged=createProxyServer({port:0,logger:entry=>entries.push(entry)});
+  const port=await listen(logged,0);
+  try {
+    const r=await fetch(`http://127.0.0.1:${port}/proxy`,{headers:proxyHeaders('http://127.0.0.1/?key=hidden-secret',{Authorization:'Bearer hidden-secret'})});
+    await r.text();
+    await new Promise(resolve=>setImmediate(resolve));
+    assert.equal(entries[0].requestId,r.headers.get('x-proxy-request-id'));
+    assert.equal(entries[0].errorCode,'PROXY_TARGET_FORBIDDEN');
+    assert.equal(entries[0].status,403);
+    assert.ok(!JSON.stringify(entries).includes('hidden-secret'));
+  } finally {await close(logged);}
+});

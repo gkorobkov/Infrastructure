@@ -58,7 +58,13 @@ export async function resolvePublicTarget(url, lookup = dns.lookup) {
 }
 
 export function originAllowed(value, allowedOrigins) {
-  return typeof value === 'string' && allowedOrigins.includes(value);
+  if (typeof value !== 'string') return false;
+  if (allowedOrigins.includes(value)) return true;
+  try {
+    const url = new URL(value);
+    return url.origin === value && ['http:', 'https:'].includes(url.protocol) &&
+      ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
+  } catch { return false; }
 }
 
 export function safeHost(header, port) {

@@ -23,6 +23,16 @@ export function createProxyServer(options={}) {
   };
   const server = http.createServer(async(request,response)=>{
     const requestId = crypto.randomUUID();
+    const started = Date.now();
+    let errorCode;
+    response.once('close', () => options.logger?.({
+      event: 'request', requestId,
+      method: methods.includes(request.method) || request.method === 'OPTIONS' ? request.method : 'OTHER',
+      endpoint: ['/health', '/proxy'].includes(request.url) ? request.url : 'unknown',
+      status: response.statusCode, completed: response.writableFinished,
+      durationMs: Date.now() - started, ...(errorCode ? {errorCode} : {}),
+      ...(request.headers.origin ? {originAllowed: originAllowed(request.headers.origin, config.allowedOrigins)} : {}),
+    }));
     response.setHeader('X-Proxy-Request-ID',requestId);
     response.setHeader('X-Content-Type-Options','nosniff');
     const origin=request.headers.origin;
@@ -54,7 +64,7 @@ export function createProxyServer(options={}) {
       }
       if(!methods.includes(request.method)) throw new ProxyError(405,'PROXY_METHOD_NOT_ALLOWED','Unsupported HTTP method.');
       await forward(request,response,config);
-    } catch(error) { reportError(response,error,requestId); }
+    } catch(error) { errorCode = error instanceof ProxyError ? error.code : 'PROXY_TARGET_CONNECTION_ERROR'; reportError(response,error,requestId); }
   });
   server.maxHeadersCount=100;
   server.headersTimeout=15000;

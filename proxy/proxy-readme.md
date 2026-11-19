@@ -45,7 +45,7 @@ const result = await fetch('http://localhost:8080/proxy', {
 });
 ```
 
-Run `curl http://localhost:8080/health` to verify startup. To authorize `https://client.example`, launch `node src/proxy-cli.js --allow-origin https://client.example`. The `--allow-origin` option is repeatable and `PROXY_ALLOWED_ORIGINS` supports a comma-separated list. The `/proxy` endpoint requires an approved browser Origin (curl is not authorized by default). By default only loopback development origins (localhost/127.0.0.1 ports 3000/5173) are allowed. Explicitly authorize other websites using `--allow-origin` or `PROXY_ALLOWED_ORIGINS`.
+Run `curl http://localhost:8080/health` to verify startup. To authorize `https://client.example`, launch `node src/proxy-cli.js --allow-origin https://client.example`. The `--allow-origin` option is repeatable and `PROXY_ALLOWED_ORIGINS` supports a comma-separated list. The `/proxy` endpoint requires an approved browser Origin (curl is not authorized by default). By default exact HTTP(S) loopback browser origins (localhost, 127.0.0.1 and [::1]) on any port are allowed. Lookalike hosts, paths and credentials are rejected. Explicitly authorize other websites using `--allow-origin` or `PROXY_ALLOWED_ORIGINS`.
 
 For a curl smoke test to an external public endpoint after starting with `--allow-origin https://client.example`:
 
@@ -90,3 +90,13 @@ Development: `cd proxy && npm test`. Building a platform executable: `npm instal
 HTTPS for localhost is not part of this version. Docker is not required or included.
 
 Launcher verification: `npm test` covers the Windows entry point on Windows and offline Unix installation fixtures on Unix. From Git Bash on Windows, run `sh proxy/test/proxy-launcher-test.sh` from the repository root. Fixtures cover Apple Silicon/Intel archive selection, paths with spaces, refusal/EOF without downloads, Enter acceptance, runtime reuse and corrupt checksums. CI includes native `macos-15` (Apple Silicon) and `macos-15-intel` jobs, including actual runtime downloads and executable smoke checks. A configured CI job is not evidence of a completed run; Finder and OS security dialogs also require manual Mac verification.
+
+## Diagnostic logs
+
+Launchers save logs to `proxy/logs/proxy.log` and print the absolute path. Direct CLI runs use `logs/proxy.log` relative to the working directory; override with `PROXY_LOG_PATH`. Events also appear in the console. On startup a file larger than 5 MiB moves to `.log.1`; one previous file is retained. Logs can grow during a long session.
+
+Requests record ID, endpoint category, method, status, duration, completion flag and proxy error code. Match `X-Proxy-Request-ID` in DevTools. Headers, target URLs, query strings and bodies are omitted. An unwritable log path prevents startup with a console error.
+
+Windows live view from the repository root: `Get-Content ./proxy/logs/proxy.log -Tail 30 -Wait`. macOS: `tail -f proxy/logs/proxy.log`.
+
+For health 200 with CORS failure, stop the old proxy with Ctrl+C and launch again. Older versions only allowed fixed development ports. If startup prints 8081 or higher, another process owns 8080: stop the old instance or use the printed URL in the client. Public origins still require explicit approval.
