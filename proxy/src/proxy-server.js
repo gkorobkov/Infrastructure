@@ -4,10 +4,7 @@ import { ProxyError, reportError } from './proxy-errors.js';
 import { forward } from './proxy-forward.js';
 import { originAllowed, requireBrowserOrigin, safeHost } from './proxy-security.js';
 
-export const DEFAULT_ORIGINS = [
-  'http://localhost:3000','http://localhost:5173',
-  'http://127.0.0.1:3000','http://127.0.0.1:5173',
-];
+export const DEFAULT_ORIGINS = [];
 const methods = ['GET','POST','PUT','PATCH','DELETE','HEAD'];
 const exposed = '*'; // credentialless fetch permits exposing all upstream response headers
 

@@ -6,7 +6,7 @@ Small provider- and client-neutral HTTP relay for browser requests to public ext
 
 **macOS (Apple Silicon and Intel):** download/clone the complete repository and double-click `proxy/proxy-start-mac.command`. If executable permissions were lost when downloading a ZIP, run `sh proxy/proxy-start-mac.command` in Terminal from the repository root. No Homebrew or administrator password is needed. Automatic installation of Node.js 24 requires macOS 13.5+, as specified in [Node.js platform requirements](https://github.com/nodejs/node/blob/v24.22.3/BUILDING.md#platform-list). Older systems need a compatible preinstalled Node.js 22+ or an OS update.
 
-**Windows:** double-click `proxy/proxy-start-win.cmd`. It calls the PowerShell helper automatically.
+**Windows:** double-click `proxy/proxy-start-win.cmd`. It opens the PowerShell helper in a separate console window and returns immediately to the caller, so a project launcher can continue starting other services. Options are forwarded. The proxy console remains open after the helper exits so diagnostics stay visible; close it when finished.
 
 **Linux:** run `sh proxy/proxy-start-unix.sh`.
 
@@ -45,7 +45,7 @@ const result = await fetch('http://localhost:8080/proxy', {
 });
 ```
 
-Run `curl http://localhost:8080/health` to verify startup. To authorize `https://client.example`, launch `node src/proxy-cli.js --allow-origin https://client.example`. The `--allow-origin` option is repeatable and `PROXY_ALLOWED_ORIGINS` supports a comma-separated list. The `/proxy` endpoint requires an approved browser Origin (curl is not authorized by default). By default exact HTTP(S) loopback browser origins (localhost, 127.0.0.1 and [::1]) on any port are allowed. Lookalike hosts, paths and credentials are rejected. Explicitly authorize other websites using `--allow-origin` or `PROXY_ALLOWED_ORIGINS`.
+Run `curl http://localhost:8080/health` to verify startup. To authorize `https://client.example`, launch `node src/proxy-cli.js --allow-origin https://client.example`. The `--allow-origin` option is repeatable and `PROXY_ALLOWED_ORIGINS` supports a comma-separated list. The `/proxy` endpoint requires an approved browser Origin (curl is not authorized by default). By default exact HTTP(S) loopback browser origins (localhost, 127.0.0.1 and [::1]) on any port are allowed. Lookalike hosts, paths and credentials are rejected. Explicitly authorize other websites using `--allow-origin` or `PROXY_ALLOWED_ORIGINS`. Startup lists additional exact browser origins only when explicitly configured; it does not list fixed development ports.
 
 For a curl smoke test to an external public endpoint after starting with `--allow-origin https://client.example`:
 

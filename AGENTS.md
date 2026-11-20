@@ -58,3 +58,5 @@ The generic HTTP proxy must not mention, bundle, or preauthorize named third-par
 Use hyphens (-) as the default word separator in all project-specific filenames, including command launchers, helpers, source files, tests, Compose files, CI workflows and documentation. Preserve conventional discovery filenames, environment variable names and existing persistent data directory names. Update references, import paths, glob patterns, process identity checks, commands and documentation together when renaming files.
 
 Proxy defaults must support exact HTTP(S) loopback browser origins (localhost, 127.0.0.1 and [::1]) on arbitrary ports, rejecting lookalike hosts and non-origin URLs. Keep public origins explicitly approved. CLI launches must persist diagnostic logs by default, print their path and record request IDs/status/error codes without headers, target URLs, query strings or bodies.
+
+Do not prepopulate or print fixed loopback development origins for the proxy. Show the additional exact browser origins section only when origins are explicitly configured.

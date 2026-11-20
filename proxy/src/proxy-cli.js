@@ -87,9 +87,7 @@ Proxy URL: http://localhost:${actual}
 Health: http://localhost:${actual}/health
 
 Log file: ${logPath}
-Loopback browser origins: HTTP(S) localhost / 127.0.0.1 / [::1], any port
-Additional exact browser origins:
-${allowedOrigins.map(o => '  ' + o).join('\n')}
+Loopback browser origins: HTTP(S) localhost / 127.0.0.1 / [::1], any port${allowedOrigins.length ? '\nAdditional exact browser origins:\n' + allowedOrigins.map(o => '  ' + o).join('\n') : ''}
 
 Press Ctrl+C to stop.`);
     let closing = false;
